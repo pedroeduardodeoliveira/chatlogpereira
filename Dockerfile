@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# Instala dependências necessárias para o Chromium (Puppeteer)
+# Instala TODAS as dependências que o Chromium precisa
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     fonts-liberation \
@@ -17,27 +17,25 @@ RUN apt-get update && apt-get install -y \
     libxcomposite1 \
     libxdamage1 \
     libxrandr2 \
+    libxfixes3 \
+    libxshmfence1 \
     xdg-utils \
     wget \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Diretório de trabalho
 WORKDIR /app
 
-# Copia package.json e instala dependências
 COPY package*.json ./
 RUN npm install --production
 
-# Copia o restante do projeto
 COPY . .
 
-# Evita download duplicado do Chromium
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+# IMPORTANTE: deixar o Puppeteer baixar o Chromium correto
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
 
-# Porta do app (5001)
+# Porta correta
 ENV PORT=5001
 EXPOSE 5001
 
-# Comando de start
 CMD ["npm", "start"]
