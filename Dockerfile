@@ -1,12 +1,9 @@
 FROM node:20-slim
 
-# Instala dependências necessárias para o Chrome
+# Instala dependências necessárias para o Chromium (Puppeteer)
 RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
     ca-certificates \
     fonts-liberation \
-    libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -21,18 +18,26 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    wget \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+# Diretório de trabalho
 WORKDIR /app
 
+# Copia package.json e instala dependências
 COPY package*.json ./
 RUN npm install --production
 
+# Copia o restante do projeto
 COPY . .
 
+# Evita download duplicado do Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
+# Porta do app (5001)
+ENV PORT=5001
 EXPOSE 5001
 
-CMD ["node", "robo.js"]
+# Comando de start
+CMD ["npm", "start"]
