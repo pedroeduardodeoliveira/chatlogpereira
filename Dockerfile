@@ -35,6 +35,7 @@ COPY . .
 
 # Deixe o Puppeteer baixar o Chromium correto
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Porta correta
 ENV PORT=5001
