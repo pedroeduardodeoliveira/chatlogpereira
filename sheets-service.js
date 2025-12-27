@@ -1,24 +1,36 @@
 const { google } = require('googleapis');
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
-// Configurações da planilha
+// ================================
+// Configurações via ENV (Coolify)
+// ================================
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const SHEET_NAME = process.env.SHEET_NAME || 'Planilha1';
+const SHEET_NAME = process.env.SHEET_NAME || 'Sheet1';
+const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
+const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 
+// ================================
+// Validações obrigatórias
+// ================================
 if (!SHEET_ID) {
-    console.error('❌ ERRO: GOOGLE_SHEET_ID não configurado no arquivo .env');
-    process.exit(1);
+    throw new Error('❌ GOOGLE_SHEET_ID não configurado');
 }
 
-/**
- * Cria e retorna um cliente autenticado do Google Sheets
- * (MESMO MÉTODO DO SEU APP ANTIGO)
- */
+if (!CLIENT_EMAIL) {
+    throw new Error('❌ GOOGLE_CLIENT_EMAIL não configurado');
+}
+
+if (!PRIVATE_KEY) {
+    throw new Error('❌ GOOGLE_PRIVATE_KEY não configurado');
+}
+
+// ================================
+// Google Sheets Client
+// ================================
 function getGoogleSheetsClient() {
     const auth = new google.auth.GoogleAuth({
         credentials: {
-            client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            client_email: CLIENT_EMAIL,
+            private_key: PRIVATE_KEY.replace(/\\n/g, '\n'),
         },
         scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
@@ -26,9 +38,9 @@ function getGoogleSheetsClient() {
     return google.sheets({ version: 'v4', auth });
 }
 
-/**
- * Busca o resultado pela chave (ex: matrícula)
- */
+// ================================
+// Busca por matrícula
+// ================================
 async function getEmployeeResult(matricula) {
     try {
         const sheets = getGoogleSheetsClient();
@@ -38,13 +50,12 @@ async function getEmployeeResult(matricula) {
             range: `${SHEET_NAME}!A:B`,
         });
 
-        const rows = response.data.values;
-        if (!rows || rows.length === 0) return null;
+        const rows = response.data.values || [];
 
         for (const row of rows) {
-            if (!row || row.length < 2) continue;
+            if (row.length < 2) continue;
 
-            if (String(row[0]).trim() === matricula) {
+            if (String(row[0]).trim() === String(matricula).trim()) {
                 return {
                     matricula: row[0],
                     resultado: row[1],
@@ -55,14 +66,14 @@ async function getEmployeeResult(matricula) {
         return null;
 
     } catch (error) {
-        console.error('❌ Erro ao acessar Google Sheets:', error.message);
-        throw error;
+        console.error('❌ Erro ao acessar Google Sheets:', error);
+        return null;
     }
 }
 
-/**
- * Busca texto de menu pela chave (1, 2, A, B)
- */
+// ================================
+// Busca texto de menu
+// ================================
 async function getMenuText(chave) {
     try {
         const sheets = getGoogleSheetsClient();
@@ -72,13 +83,12 @@ async function getMenuText(chave) {
             range: `${SHEET_NAME}!A:B`,
         });
 
-        const rows = response.data.values;
-        if (!rows || rows.length === 0) return null;
+        const rows = response.data.values || [];
 
         for (const row of rows) {
-            if (!row || row.length < 2) continue;
+            if (row.length < 2) continue;
 
-            if (String(row[0]).trim().toUpperCase() === chave.toUpperCase()) {
+            if (String(row[0]).trim().toUpperCase() === String(chave).trim().toUpperCase()) {
                 return String(row[1]).trim();
             }
         }
@@ -86,8 +96,8 @@ async function getMenuText(chave) {
         return null;
 
     } catch (error) {
-        console.error('❌ Erro ao buscar menu no Google Sheets:', error.message);
-        throw error;
+        console.error('❌ Erro ao buscar menu no Google Sheets:', error);
+        return null;
     }
 }
 
