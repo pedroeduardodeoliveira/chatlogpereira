@@ -12,6 +12,11 @@ if (!CLIENT_EMAIL) throw new Error("❌ GOOGLE_CLIENT_EMAIL não configurado");
 if (!PRIVATE_KEY) throw new Error("❌ GOOGLE_PRIVATE_KEY não configurado");
 
 // 🔹 auth
+console.log(`🔑 Config Auth Check:`);
+console.log(`   Email: ${CLIENT_EMAIL}`);
+console.log(`   Key Start: ${PRIVATE_KEY ? PRIVATE_KEY.substring(0, 20) + "..." : "NULL"}`);
+console.log(`   Key Length: ${PRIVATE_KEY ? PRIVATE_KEY.length : 0}`);
+
 const auth = new google.auth.JWT(
   CLIENT_EMAIL,
   null,
