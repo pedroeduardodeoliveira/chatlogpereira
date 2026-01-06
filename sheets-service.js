@@ -13,9 +13,15 @@ if (!PRIVATE_KEY) throw new Error("❌ GOOGLE_PRIVATE_KEY não configurado");
 
 // 🔹 auth
 console.log(`🔑 Config Auth Check:`);
-console.log(`   Email: ${CLIENT_EMAIL}`);
-console.log(`   Key Start: ${PRIVATE_KEY ? PRIVATE_KEY.substring(0, 20) + "..." : "NULL"}`);
-console.log(`   Key Length: ${PRIVATE_KEY ? PRIVATE_KEY.length : 0}`);
+console.log(`   Email: '${CLIENT_EMAIL}'`);
+
+if (PRIVATE_KEY) {
+  console.log(`   Key Length: ${PRIVATE_KEY.length}`);
+  console.log(`   Key Starts With ('-----BEGIN'): ${PRIVATE_KEY.trim().startsWith('-----BEGIN')}`);
+  console.log(`   Key Contains Newlines: ${PRIVATE_KEY.includes('\n')}`);
+} else {
+  console.log(`   Key is FALSY (Undefined/Null/Empty)`);
+}
 
 const auth = new google.auth.JWT(
   CLIENT_EMAIL,
