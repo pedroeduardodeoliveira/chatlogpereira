@@ -35,6 +35,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 RUN npm install --production
+
+COPY . .
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Porta correta
