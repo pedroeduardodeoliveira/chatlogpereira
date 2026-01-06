@@ -35,9 +35,17 @@
             <pre id="log"></pre>
         </div>
 
-        <!-- Card QR Code -->
-        <div id="qr-container" class="card" style="display: none; text-align: center;">
-            <h3>Escaneie o QR Code:</h3>
+        <!-- Botão para abrir Modal QR -->
+        <div id="qr-btn-container" class="card" style="display: none; text-align: center;">
+            <button id="btn-open-qr" class="btn-qr">📱 Mostrar QR Code</button>
+        </div>
+    </div>
+
+    <!-- Modal QR Code -->
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 style="margin-bottom: 15px;">Escaneie o QR Code:</h3>
             <img id="qr-image" src="" alt="QR Code" style="max-width: 100%; height: auto;">
         </div>
     </div>
@@ -76,16 +84,39 @@
             logEl.scrollTop = logEl.scrollHeight;
         });
 
-        const qrContainer = document.getElementById("qr-container");
+        const qrBtnContainer = document.getElementById("qr-btn-container");
+        const btnOpenQr = document.getElementById("btn-open-qr");
+        const qrModal = document.getElementById("qr-modal");
         const qrImage = document.getElementById("qr-image");
+        const closeModal = document.querySelector(".close");
+
+        // Abrir modal
+        btnOpenQr.onclick = function () {
+            qrModal.style.display = "block";
+        }
+
+        // Fechar modal
+        closeModal.onclick = function () {
+            qrModal.style.display = "none";
+        }
+
+        // Fechar clícando fora
+        window.onclick = function (event) {
+            if (event.target == qrModal) {
+                qrModal.style.display = "none";
+            }
+        }
 
         socket.on("qr", url => {
             if (url) {
-                qrContainer.style.display = "block";
+                qrBtnContainer.style.display = "block"; // Mostra botão
                 qrImage.src = url;
                 statusEmojiEl.textContent = "📷";
+                // Opcional: abrir modal automaticamente na primeira vez
+                // qrModal.style.display = "block"; 
             } else {
-                qrContainer.style.display = "none";
+                qrBtnContainer.style.display = "none"; // Esconde botão
+                qrModal.style.display = "none"; // Fecha modal se conectar
                 qrImage.src = "";
             }
         });
