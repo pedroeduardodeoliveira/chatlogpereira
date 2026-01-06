@@ -1,7 +1,8 @@
 FROM node:20-slim
 
-# Instala TODAS as dependências necessárias para o Chromium
+# Instala Chromium e dependências
 RUN apt-get update && apt-get install -y \
+    chromium \
     ca-certificates \
     fonts-liberation \
     libasound2 \
@@ -29,12 +30,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY package*.json ./
+# Pula o download do Chromium pelo Puppeteer, pois usaremos o do sistema
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 RUN npm install --production
-
-COPY . .
-
-# Deixe o Puppeteer baixar o Chromium correto
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Porta correta
