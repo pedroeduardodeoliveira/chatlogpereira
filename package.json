@@ -4,7 +4,7 @@
   "description": "Bot WhatsApp com whatsapp-web.js e interface web",
   "main": "robo.js",
   "scripts": {
-    "start": "rm -rf .wwebjs_auth/session*/Default/SingletonLock && node robo.js"
+    "start": "node robo.js"
   },
   "engines": {
     "node": ">=18 <=20"

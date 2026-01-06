@@ -180,4 +180,36 @@ client.on("message", async msg => {
 });
 
 // Inicializa o bot
+const fs = require('fs');
+const path = require('path');
+
+function removeSingletonLock(dir) {
+    if (!fs.existsSync(dir)) return;
+
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+        const fullPath = path.join(dir, file);
+        const stat = fs.statSync(fullPath);
+
+        if (stat.isDirectory()) {
+            removeSingletonLock(fullPath);
+        } else if (file === 'SingletonLock') {
+            try {
+                fs.unlinkSync(fullPath);
+                console.log(`🔒 Removed Lock file: ${fullPath}`);
+            } catch (error) {
+                console.error(`❌ Erro ao remover lock: ${error.message}`);
+            }
+        }
+    }
+}
+
+// Tenta limpar o lock antes de iniciar
+try {
+    console.log("🧹 Verificando arquivos de lock...");
+    removeSingletonLock(path.join(__dirname, '.wwebjs_auth'));
+} catch (e) {
+    console.error("Erro na limpeza de lock:", e);
+}
+
 client.initialize();
