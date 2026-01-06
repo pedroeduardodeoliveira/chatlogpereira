@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Bot WhatsApp</title>
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
+
 <body>
     <div class="background"></div>
 
@@ -18,7 +20,7 @@
         <!-- Card Status e Contador -->
         <div class="cards-row">
             <div class="card card-status">
-                <span>Status: 
+                <span>Status:
                     <span id="bot-status-emoji" class="blink-emoji">⚠️</span>
                     <span id="bot-status-text" class="status-text">Aguardando conexão...</span>
                 </span>
@@ -31,6 +33,12 @@
         <!-- Card Log -->
         <div class="card card-log">
             <pre id="log"></pre>
+        </div>
+
+        <!-- Card QR Code -->
+        <div id="qr-container" class="card" style="display: none; text-align: center;">
+            <h3>Escaneie o QR Code:</h3>
+            <img id="qr-image" src="" alt="QR Code" style="max-width: 100%; height: auto;">
         </div>
     </div>
 
@@ -48,7 +56,7 @@
         const logEl = document.getElementById("log");
 
         socket.on("status", status => {
-            if(status === "Conectado") {
+            if (status === "Conectado") {
                 statusEmojiEl.textContent = "🟢"; // emoji verde
                 statusTextEl.textContent = "Conectado";
             } else {
@@ -67,6 +75,21 @@
             logEl.innerHTML += `<span style="${logColor}">${msg}</span>\n`;
             logEl.scrollTop = logEl.scrollHeight;
         });
+
+        const qrContainer = document.getElementById("qr-container");
+        const qrImage = document.getElementById("qr-image");
+
+        socket.on("qr", url => {
+            if (url) {
+                qrContainer.style.display = "block";
+                qrImage.src = url;
+                statusEmojiEl.textContent = "📷";
+            } else {
+                qrContainer.style.display = "none";
+                qrImage.src = "";
+            }
+        });
     </script>
 </body>
+
 </html>

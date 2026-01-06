@@ -1,4 +1,5 @@
 const qrcode = require("qrcode-terminal");
+const QRCode = require('qrcode');
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const express = require("express");
 const http = require("http");
@@ -95,15 +96,25 @@ function atualizarContador() {
 client.on("qr", qr => {
     console.log("📱 Escaneie o QR code abaixo:");
     qrcode.generate(qr, { small: true });
-    for (const socket of connectedSockets) {
-        socket.emit("status", "Aguardando conexão...");
-    }
+
+    // Gera QR Code para enviar pro front
+    QRCode.toDataURL(qr, (err, url) => {
+        if (err) {
+            console.error("Erro ao gerar QR code", err);
+            return;
+        }
+        for (const socket of connectedSockets) {
+            socket.emit("qr", url);
+            socket.emit("status", "Aguardando leitura do QR Code...");
+        }
+    });
 });
 
 client.on("ready", () => {
     console.log("🤖 Bot conectado e funcionando!");
     for (const socket of connectedSockets) {
         socket.emit("status", "Conectado");
+        socket.emit("qr", null); // Limpa QR code
     }
 });
 
