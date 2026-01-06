@@ -19,6 +19,14 @@ const auth = new google.auth.JWT(
   ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 );
 
+// Tenta autenticar imediatamente para validar as credenciais
+auth.authorize().then(() => {
+  console.log("✅ Google Auth com sucesso!");
+}).catch(err => {
+  console.error("❌ Erro na autenticação do Google:", err.message);
+  console.error("Verifique se o GOOGLE_PRIVATE_KEY está correto (incluindo -----BEGIN... e quebras de linha)");
+});
+
 const sheets = google.sheets({ version: "v4", auth });
 
 /**
