@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bot WhatsApp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <div class="background"></div>
+
+    <div class="container">
+        <!-- Card Título -->
+        <div class="card card-title">
+            🤖 Bot Revenda Pereira
+        </div>
+
+        <!-- Card Status e Contador -->
+        <div class="cards-row">
+            <div class="card card-status">
+                <span>Status:
+                    <span id="bot-status-emoji" class="blink-emoji">⚠️</span>
+                    <span id="bot-status-text" class="status-text">Aguardando conexão...</span>
+                </span>
+            </div>
+            <div class="card card-contador">
+                <span>📊 Mensagens hoje: <span id="contador-mensagens">0</span></span>
+            </div>
+        </div>
+
+        <!-- Card Log -->
+        <div class="card card-log">
+            <pre id="log"></pre>
+        </div>
+
+        <!-- Botão para abrir Modal QR -->
+        <div id="qr-btn-container" class="card" style="display: none; text-align: center;">
+            <button id="btn-open-qr" class="btn-qr">📱 Mostrar QR Code</button>
+        </div>
+    </div>
+
+    <!-- Modal QR Code -->
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 style="margin-bottom: 15px;">Escaneie o QR Code:</h3>
+            <img id="qr-image" src="" alt="QR Code" style="max-width: 100%; height: auto;">
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Desenvolvido por Pedro Eduardo
+    </div>
+
+    <script>
+        const socket = io();
+
+        const statusEmojiEl = document.getElementById("bot-status-emoji");
+        const statusTextEl = document.getElementById("bot-status-text");
+        const contadorEl = document.getElementById("contador-mensagens");
+        const logEl = document.getElementById("log");
+
+        socket.on("status", status => {
+            if (status === "Conectado") {
+                statusEmojiEl.textContent = "🟢"; // emoji verde
+                statusTextEl.textContent = "Conectado";
+            } else {
+                statusEmojiEl.textContent = "⚠️"; // emoji amarelo
+                statusTextEl.textContent = "Aguardando conexão...";
+            }
+        });
+
+        socket.on("contador", count => {
+            contadorEl.textContent = count;
+        });
+
+        socket.on("log", msg => {
+            // Checa se mensagem tem "Sim" ou "Não" para cores
+            const logColor = msg.includes("| Respondida: Sim") ? "color: #00ff00;" : "color: #ff4c4c;";
+            logEl.innerHTML += `<span style="${logColor}">${msg}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        });
+
+        const qrBtnContainer = document.getElementById("qr-btn-container");
+        const btnOpenQr = document.getElementById("btn-open-qr");
+        const qrModal = document.getElementById("qr-modal");
+        const qrImage = document.getElementById("qr-image");
+        const closeModal = document.querySelector(".close");
+
+        // Abrir modal
+        btnOpenQr.onclick = function () {
+            qrModal.style.display = "block";
+        }
+
+        // Fechar modal
+        closeModal.onclick = function () {
+            qrModal.style.display = "none";
+        }
+
+        // Fechar clícando fora
+        window.onclick = function (event) {
+            if (event.target == qrModal) {
+                qrModal.style.display = "none";
+            }
+        }
+
+        socket.on("qr", url => {
+            if (url) {
+                qrBtnContainer.style.display = "block"; // Mostra botão
+                qrImage.src = url;
+                statusEmojiEl.textContent = "📷";
+                // Opcional: abrir modal automaticamente na primeira vez
+                // qrModal.style.display = "block"; 
+            } else {
+                qrBtnContainer.style.display = "none"; // Esconde botão
+                qrModal.style.display = "none"; // Fecha modal se conectar
+                qrImage.src = "";
+            }
+        });
+    </script>
+</body>
+
+</html>
