@@ -1,2 +1,0 @@
-# chatlogpereira
-chatbot logistica pereira
