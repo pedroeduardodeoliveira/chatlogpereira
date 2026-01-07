@@ -23,15 +23,18 @@ if (PRIVATE_KEY) {
   console.log(`   Key is FALSY (Undefined/Null/Empty)`);
 }
 
-const auth = new google.auth.JWT({
-  email: CLIENT_EMAIL,
-  key: PRIVATE_KEY,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+// Tente usar GoogleAuth que é mais moderno e robusto
+const auth = new google.auth.GoogleAuth({
+  credentials: {
+    client_email: CLIENT_EMAIL,
+    private_key: PRIVATE_KEY,
+  },
+  scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
 });
 
 // Tenta autenticar imediatamente para validar as credenciais
-auth.authorize().then(() => {
-  console.log("✅ Google Auth com sucesso!");
+auth.getClient().then(client => {
+  console.log("✅ Google Auth com sucesso! (Client Version)");
 }).catch(err => {
   console.error("❌ Erro na autenticação do Google:", err.message);
   console.error("Verifique se o GOOGLE_PRIVATE_KEY está correto (incluindo -----BEGIN... e quebras de linha)");
