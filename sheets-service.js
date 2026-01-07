@@ -11,33 +11,40 @@ if (!TAB_NAME) throw new Error("❌ GOOGLE_SHEET_TAB não configurado");
 if (!CLIENT_EMAIL) throw new Error("❌ GOOGLE_CLIENT_EMAIL não configurado");
 if (!PRIVATE_KEY) throw new Error("❌ GOOGLE_PRIVATE_KEY não configurado");
 
+const fs = require('fs');
+const path = require('path');
+
 // 🔹 auth
 console.log(`🔑 Config Auth Check:`);
 console.log(`   Email: '${CLIENT_EMAIL}'`);
 
-if (PRIVATE_KEY) {
-  console.log(`   Key Length: ${PRIVATE_KEY.length}`);
-  console.log(`   Key Starts With ('-----BEGIN'): ${PRIVATE_KEY.trim().startsWith('-----BEGIN')}`);
-  console.log(`   Key Contains Newlines: ${PRIVATE_KEY.includes('\n')}`);
-} else {
-  console.log(`   Key is FALSY (Undefined/Null/Empty)`);
+// Estratégia: Salvar credenciais em arquivo temporário para garantir que o GoogleAuth leia corretamente
+const CREDENTIALS_PATH = path.join(__dirname, 'google-credentials.json');
+
+try {
+  const credentials = {
+    "type": "service_account",
+    "private_key": PRIVATE_KEY,
+    "client_email": CLIENT_EMAIL,
+    "token_uri": "https://oauth2.googleapis.com/token"
+  };
+
+  fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(credentials));
+  console.log(`✅ Arquivo de credenciais criado em: ${CREDENTIALS_PATH}`);
+} catch (err) {
+  console.error("❌ Erro ao criar arquivo de credenciais:", err);
 }
 
-// Tente usar GoogleAuth que é mais moderno e robusto
 const auth = new google.auth.GoogleAuth({
-  credentials: {
-    client_email: CLIENT_EMAIL,
-    private_key: PRIVATE_KEY,
-  },
+  keyFile: CREDENTIALS_PATH,
   scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
 });
 
-// Tenta autenticar imediatamente para validar as credenciais
+// Tenta autenticar imediatamente
 auth.getClient().then(client => {
-  console.log("✅ Google Auth com sucesso! (Client Version)");
+  console.log("✅ Google Auth com sucesso! (File Strategy)");
 }).catch(err => {
   console.error("❌ Erro na autenticação do Google:", err.message);
-  console.error("Verifique se o GOOGLE_PRIVATE_KEY está correto (incluindo -----BEGIN... e quebras de linha)");
 });
 
 const sheets = google.sheets({ version: "v4", auth });
