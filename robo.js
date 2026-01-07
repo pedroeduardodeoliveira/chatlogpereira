@@ -146,37 +146,48 @@ client.on("ready", () => {
 });
 
 client.on("message", async msg => {
-    const texto = msg.body.trim();
-    const fromNumber = msg.from.replace(/@c\.us$/, "");
-    let respondeu = false;
+    try {
+        const texto = msg.body.trim();
+        const fromNumber = msg.from.replace(/@c\.us$/, "");
+        let respondeu = false;
 
-    // Se for número → matrícula
-    if (/^\d+$/.test(texto)) {
-        const result = await getEmployeeResult(texto);
-        if (result) {
-            await enviarComDigitando(msg.from, result.resultado);
-            respondeu = true;
+        console.log(`📨 Processando mensagem de ${fromNumber}: "${texto}"`);
+
+        // Se for número → matrícula
+        if (/^\d+$/.test(texto)) {
+            console.log("🔢 Detectado como matrícula/número");
+            const result = await getEmployeeResult(texto);
+            if (result) {
+                await enviarComDigitando(msg.from, result.resultado);
+                respondeu = true;
+            } else {
+                await enviarComDigitando(msg.from, "❌ Matrícula não encontrada, tente novamente.");
+            }
         } else {
-            await enviarComDigitando(msg.from, "❌ Matrícula não encontrada, tente novamente.");
+            console.log("📝 Detectado como texto/menu");
+            const menu = await getMenuText(texto);
+            if (menu) {
+                await enviarComDigitando(msg.from, menu);
+                respondeu = true;
+            }
         }
-    } else {
-        const menu = await getMenuText(texto);
-        if (menu) {
-            await enviarComDigitando(msg.from, menu);
-            respondeu = true;
+
+        if (!respondeu) {
+            console.log("❓ Nenhuma resposta encontrada no Sheets. Enviando padrão.");
+            await enviarComDigitando(msg.from, "🤖 Não entendi. Digite *MENU* para voltar.");
         }
+
+        contadorMensagens++;
+        atualizarContador();
+
+        const log = `📨 Mensagem recebida de: ${fromNumber} | Mensagem: ${texto} | Respondida: ${respondeu ? "Sim" : "Não"}`;
+        console.log(log);
+        enviarLog(log);
+
+    } catch (error) {
+        console.error("❌ ERRO FATAL no processamento da mensagem:", error);
+        enviarLog(`❌ Erro interno: ${error.message}`);
     }
-
-    if (!respondeu) {
-        await enviarComDigitando(msg.from, "🤖 Não entendi. Digite *MENU* para voltar.");
-    }
-
-    contadorMensagens++;
-    atualizarContador();
-
-    const log = `📨 Mensagem recebida de: ${fromNumber} | Mensagem: ${texto} | Respondida: ${respondeu ? "Sim" : "Não"}`;
-    console.log(log);
-    enviarLog(log);
 });
 
 // Inicializa o bot

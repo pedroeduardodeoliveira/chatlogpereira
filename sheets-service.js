@@ -47,6 +47,7 @@ const sheets = google.sheets({ version: "v4", auth });
  * Usa a guia definida por env
  */
 async function getMenuText(comando) {
+  console.log(`🔍 Buscando MENU: "${comando}" na aba "${TAB_NAME}"`);
   const range = `${TAB_NAME}!A:B`;
 
   const res = await sheets.spreadsheets.values.get({
@@ -55,11 +56,13 @@ async function getMenuText(comando) {
   });
 
   const rows = res.data.values || [];
+  console.log(`📊 Total de linhas baixadas: ${rows.length}`);
 
   const linha = rows.find(
     row => row[0]?.toUpperCase() === comando.toUpperCase()
   );
 
+  console.log(`✅ Resultado encontrado:`, linha ? "SIM" : "NÃO");
   return linha ? linha[1] : null;
 }
 
