@@ -23,12 +23,11 @@ if (PRIVATE_KEY) {
   console.log(`   Key is FALSY (Undefined/Null/Empty)`);
 }
 
-const auth = new google.auth.JWT(
-  CLIENT_EMAIL,
-  null,
-  PRIVATE_KEY,
-  ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-);
+const auth = new google.auth.JWT({
+  email: CLIENT_EMAIL,
+  key: PRIVATE_KEY,
+  scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+});
 
 // Tenta autenticar imediatamente para validar as credenciais
 auth.authorize().then(() => {
