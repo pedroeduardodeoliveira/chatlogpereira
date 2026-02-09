@@ -47,10 +47,8 @@ export class GoogleSheetsService {
                 return [];
             }
 
-            // Remove header row if exists
-            const dataRows = rows.slice(1);
-
-            const sheetData: SheetData[] = dataRows
+            // Use all rows (no header row in this sheet)
+            const sheetData: SheetData[] = rows
                 .filter(row => row[0] && row[1]) // Only rows with both columns filled
                 .map(row => ({
                     question: row[0].trim(),

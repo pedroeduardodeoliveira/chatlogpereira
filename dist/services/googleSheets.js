@@ -32,9 +32,8 @@ class GoogleSheetsService {
                 console.log('⚠️  Nenhum dado encontrado na planilha');
                 return [];
             }
-            // Remove header row if exists
-            const dataRows = rows.slice(1);
-            const sheetData = dataRows
+            // Use all rows (no header row in this sheet)
+            const sheetData = rows
                 .filter(row => row[0] && row[1]) // Only rows with both columns filled
                 .map(row => ({
                 question: row[0].trim(),
