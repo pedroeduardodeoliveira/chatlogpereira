@@ -50,7 +50,19 @@ class GoogleSheetsService {
     }
     findAnswer(sheetData, userMessage) {
         const normalizedMessage = userMessage.trim();
+        console.log(`🔍 Buscando resposta para: "${normalizedMessage}"`);
+        console.log(`📋 Total de registros na planilha: ${sheetData.length}`);
+        // Debug: show first 5 questions in the sheet
+        if (sheetData.length > 0) {
+            console.log('📝 Primeiras perguntas na planilha:', sheetData.slice(0, 5).map(d => `"${d.question}"`).join(', '));
+        }
         const match = sheetData.find(data => data.question.toLowerCase() === normalizedMessage.toLowerCase());
+        if (match) {
+            console.log(`✅ Correspondência encontrada: "${match.question}" -> "${match.answer}"`);
+        }
+        else {
+            console.log(`❌ Nenhuma correspondência encontrada para: "${normalizedMessage}"`);
+        }
         return match ? match.answer : null;
     }
 }

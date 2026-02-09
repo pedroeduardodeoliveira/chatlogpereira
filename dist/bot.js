@@ -36,7 +36,7 @@ class WhatsAppBot {
         this.client.on('ready', async () => {
             console.log('🚀 Bot do WhatsApp está pronto!');
             console.log('📱 Status: CONECTADO');
-            console.log('⏰ Horário:', new Date().toLocaleString('pt-BR'));
+            console.log('⏰ Horário:', new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
             // Load sheet data
             await this.loadSheetData();
         });
@@ -69,13 +69,10 @@ class WhatsAppBot {
         if (message.from.includes('@g.us') || message.isStatus) {
             return;
         }
-        const timestamp = new Date().toLocaleString('pt-BR');
+        const now = new Date();
+        const timestamp = now.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         const from = message.from;
         const userMessage = message.body;
-        console.log('\n📨 MENSAGEM RECEBIDA');
-        console.log(`⏰ Horário: ${timestamp}`);
-        console.log(`👤 De: ${from}`);
-        console.log(`💬 Mensagem: ${userMessage}`);
         // Find answer in sheet data
         const answer = this.sheetsService.findAnswer(this.sheetData, userMessage);
         let responded = false;
@@ -83,22 +80,21 @@ class WhatsAppBot {
         if (answer) {
             responseText = answer;
             responded = true;
-            console.log(`✅ Resposta encontrada: ${responseText}`);
         }
         else {
             responseText = this.defaultMessage;
             responded = true;
-            console.log(`⚠️  Resposta não encontrada - enviando mensagem padrão`);
         }
         // Send response
         try {
             await message.reply(responseText);
-            console.log(`📤 Resposta enviada com sucesso`);
         }
         catch (error) {
             console.error(`❌ Erro ao enviar resposta:`, error);
             responded = false;
         }
+        // Log the message in a single line
+        console.log(`mensagem recebida em ${timestamp} de: ${from} | Respondida: ${responded ? 'Sim' : 'Não'}`);
         // Log the message
         this.messageLog.push({
             timestamp,
@@ -107,8 +103,6 @@ class WhatsAppBot {
             responded,
             response: responseText,
         });
-        console.log(`📊 Total de mensagens processadas: ${this.messageLog.length}`);
-        console.log('─'.repeat(60));
     }
     async start() {
         console.log('🔄 Iniciando bot do WhatsApp...');
