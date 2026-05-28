@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Sheets Bot - Painel de Controle</title>
+  <!-- Google Fonts Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CSS Personalizado -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Fundo com gradiente animado de luzes -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <div class="app-container">
+    <!-- CABEÇALHO -->
+    <header class="main-header glass-card">
+      <div class="brand">
+        <div class="logo-icon">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div class="brand-text">
+          <h1>PROCV Bot</h1>
+          <p>WhatsApp + Google Sheets Real-Time</p>
+        </div>
+      </div>
+      
+      <div class="status-indicator">
+        <span class="status-dot disconnected" id="header-status-dot"></span>
+        <span class="status-text" id="header-status-text">DESCONECTADO</span>
+      </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="dashboard-grid">
+      
+      <!-- CARD 1: WHATSAPP CONEXÃO / QR CODE -->
+      <section class="dashboard-card glass-card" id="connection-card">
+        <h2 class="card-title">
+          <i class="fa-solid fa-qrcode icon-accent"></i> Conexão WhatsApp
+        </h2>
+        <div class="connection-display">
+          
+          <!-- Estado: Desconectado/Carregando -->
+          <div id="connection-initializing" class="state-view">
+            <div class="spinner"></div>
+            <p>Inicializando serviço do WhatsApp...</p>
+            <span class="subtext">Isso pode levar alguns segundos na primeira execução.</span>
+          </div>
+
+          <!-- Estado: QR Code disponível -->
+          <div id="connection-qr" class="state-view hidden">
+            <div class="qr-container-outer">
+              <div class="qr-container">
+                <img id="qr-image" src="" alt="Escaneie o QR Code">
+              </div>
+            </div>
+            <p class="qr-instruction">Escaneie o QR Code acima com seu WhatsApp para ativar o bot.</p>
+            <span class="subtext"><i class="fa-solid fa-circle-info"></i> O QR Code também está visível no terminal do Dokploy.</span>
+          </div>
+
+          <!-- Estado: Conectado -->
+          <div id="connection-ready" class="state-view hidden">
+            <div class="success-ripple">
+              <div class="ripple-circle"></div>
+              <div class="success-icon">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+            </div>
+            <h3>Dispositivo Conectado</h3>
+            <p id="whatsapp-info">Pronto para responder mensagens!</p>
+            <span class="subtext success-text"><i class="fa-solid fa-shield-halved"></i> Monitoramento ativo e estável</span>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- CARD 2: ESTATÍSTICAS DE PROCESSAMENTO -->
+      <section class="dashboard-card glass-card" id="stats-card">
+        <h2 class="card-title">
+          <i class="fa-solid fa-chart-simple icon-accent"></i> Estatísticas Live
+        </h2>
+        <div class="stats-grid">
+          
+          <div class="stat-box">
+            <span class="stat-num" id="stat-received">0</span>
+            <span class="stat-label">Mensagens Recebidas</span>
+            <i class="fa-regular fa-envelope stat-bg-icon"></i>
+          </div>
+          
+          <div class="stat-box">
+            <span class="stat-num success-color" id="stat-responded">0</span>
+            <span class="stat-label">Respostas PROCV</span>
+            <i class="fa-regular fa-comments stat-bg-icon"></i>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-num warning-color" id="stat-nomatch">0</span>
+            <span class="stat-label">Respostas Padrão</span>
+            <i class="fa-regular fa-circle-question stat-bg-icon"></i>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-num danger-color" id="stat-errors">0</span>
+            <span class="stat-label">Falhas / Erros</span>
+            <i class="fa-solid fa-triangle-exclamation stat-bg-icon"></i>
+          </div>
+
+        </div>
+        
+        <div class="uptime-bar">
+          <span><i class="fa-solid fa-clock"></i> Ativo desde: <strong id="start-time">--/--/---- --:--</strong></span>
+        </div>
+      </section>
+
+      <!-- CARD 3: DIAGNÓSTICO DO GOOGLE SHEETS -->
+      <section class="dashboard-card glass-card" id="diagnostics-card">
+        <h2 class="card-title">
+          <i class="fa-solid fa-database icon-accent"></i> Google Sheets Live
+        </h2>
+        <p class="section-desc">O bot carrega os resultados mais recentes em tempo real para cada mensagem.</p>
+        
+        <div class="diagnostics-action">
+          <button id="btn-test-sheets" class="btn btn-secondary">
+            <i class="fa-solid fa-plug-circle-bolt"></i> Testar Conexão Planilha
+          </button>
+          
+          <div id="sheets-test-result" class="test-result hidden">
+            <!-- Renderizado dinamicamente pelo JS -->
+          </div>
+        </div>
+
+        <div class="sheets-meta-info">
+          <div class="meta-row">
+            <span>Cache de Proteção:</span>
+            <strong id="meta-cache-ttl">Ativo (2s)</strong>
+          </div>
+          <div class="meta-row">
+            <span>Aba Configurada:</span>
+            <strong id="meta-sheet-tab">...</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD 4: SIMULADOR DE PROCV (TESTE SEM CELULAR!) -->
+      <section class="dashboard-card glass-card" id="simulator-card">
+        <h2 class="card-title">
+          <i class="fa-solid fa-terminal icon-accent"></i> Simulador de PROCV
+        </h2>
+        <p class="section-desc">Digite o critério e veja a resposta correspondente da planilha instantaneamente.</p>
+        
+        <form id="procv-sim-form" class="sim-form">
+          <div class="input-group">
+            <input type="text" id="sim-input" placeholder="Ex: Olá, Horário, Endereço..." required autocomplete="off">
+            <button type="submit" class="btn btn-primary" id="btn-simulate">
+              <i class="fa-solid fa-play"></i> Buscar
+            </button>
+          </div>
+        </form>
+
+        <div id="sim-result-box" class="sim-result-box hidden">
+          <span class="sim-result-label">Resultado encontrado:</span>
+          <div class="sim-result-content" id="sim-result-text"></div>
+          <div class="sim-result-badge" id="sim-result-badge"></div>
+        </div>
+      </section>
+
+      <!-- CARD 5: REGISTRO DE ATIVIDADE EM TEMPO REAL -->
+      <section class="dashboard-card glass-card col-span-2" id="logs-card">
+        <div class="card-header-flex">
+          <h2 class="card-title">
+            <i class="fa-solid fa-list-check icon-accent"></i> Registro de Atividade (Live)
+          </h2>
+          <span class="badge" id="log-count">0 logs exibidos</span>
+        </div>
+        
+        <div class="table-container">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th width="12%">Horário</th>
+                <th width="18%">Número</th>
+                <th width="30%">Mensagem Recebida</th>
+                <th width="30%">Resposta Enviada</th>
+                <th width="10%">Status</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <!-- Renderizado dinamicamente -->
+              <tr class="empty-row">
+                <td colspan="5">Aguardando atividade do bot para listar registros...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="main-footer">
+      <p>WhatsApp VLOOKUP Bot &copy; 2026. Desenvolvido para estabilidade total no Dokploy.</p>
+    </footer>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

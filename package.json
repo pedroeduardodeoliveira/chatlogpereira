@@ -1,0 +1,30 @@
+{
+  "name": "whatsapp-vlookup-bot",
+  "version": "2.0.0",
+  "description": "WhatsApp Bot integrado em tempo real com Google Sheets (PROCV) com Dashboard Premium",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "google-sheets",
+    "vlookup",
+    "procv",
+    "dokploy"
+  ],
+  "author": "Antigravity AI",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "googleapis": "^131.0.0",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#main"
+  }
+}
