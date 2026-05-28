@@ -2,6 +2,7 @@ FROM node:20-slim
 
 # Instala dependências do sistema necessárias para rodar o Puppeteer e o Chromium em modo headless
 RUN apt-get update && apt-get install -y \
+    git \
     chromium \
     fonts-ipafont-gothic \
     fonts-wqy-zenhei \
