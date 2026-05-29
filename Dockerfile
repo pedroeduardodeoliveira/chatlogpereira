@@ -17,6 +17,10 @@ RUN apt-get update && apt-get install -y \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
+# Configura o git para usar HTTPS no lugar de SSH ao clonar do GitHub, evitando falhas de autenticação/chaves
+RUN git config --global url."https://github.com/".insteadOf ssh://git@github.com/ && \
+    git config --global url."https://github.com/".insteadOf git@github.com:
+
 WORKDIR /app
 
 # Copia arquivos de dependência
